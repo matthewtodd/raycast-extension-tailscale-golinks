@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Icon, List } from "@raycast/api";
+import { Action, ActionPanel, Icon, List, open } from "@raycast/api";
 import { getFavicon, useFetch } from "@raycast/utils";
 import { useState } from "react";
 
@@ -9,6 +9,12 @@ type GoLink = {
   LastEdit: string;
   Owner: string;
 };
+
+async function openResolved(url: string) {
+  const response = await fetch(url, { redirect: "follow" });
+  response.body?.cancel();
+  await open(response.url);
+}
 
 const favicon = (string: string) => {
   const match = string.match(/https?:\/\/.*?\//);
@@ -31,8 +37,8 @@ function Path({ golink }: { golink: GoLink }) {
         accessories={[{ icon: Icon.Person, text: golink.Owner }]}
         actions={
           <ActionPanel>
-            <Action.OpenInBrowser url={"http://go/" + golink.Short + "/" + searchText} />
-            <Action.OpenInBrowser url={"http://go/.detail/" + golink.Short} title="Open Details in Browser" />
+            <Action title="Open in Browser" icon={Icon.Globe} onAction={() => openResolved("http://go/" + golink.Short + "/" + searchText)} />
+            <Action title="Open Details in Browser" icon={Icon.Globe} onAction={() => openResolved("http://go/.detail/" + golink.Short)} />
             <Action.CopyToClipboard content={"http://go/" + golink.Short + "/" + searchText} shortcut={{ modifiers: ["cmd"], key: "c" }} />
           </ActionPanel>
         }
@@ -58,8 +64,8 @@ function Item({ golink }: { golink: GoLink }) {
           </ActionPanel>
         ) : (
           <ActionPanel>
-            <Action.OpenInBrowser url={"http://go/" + golink.Short} />
-            <Action.OpenInBrowser url={"http://go/.detail/" + golink.Short} title="Open Details in Browser" />
+            <Action title="Open in Browser" icon={Icon.Globe} onAction={() => openResolved("http://go/" + golink.Short)} />
+            <Action title="Open Details in Browser" icon={Icon.Globe} onAction={() => openResolved("http://go/.detail/" + golink.Short)} />
             <Action.CopyToClipboard content={"http://go/" + golink.Short} shortcut={{ modifiers: ["cmd"], key: "c" }} />
           </ActionPanel>
         )
